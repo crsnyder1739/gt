@@ -1,0 +1,337 @@
+/* ═══════════════════════════════════════════
+   Gmail Sign-in — Pixel-perfect Google dark S
+   Mobile-first · No scroll · Exact sizing
+═══════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Roboto:wght@300;400;500&display=swap');
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+    height: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* ── Body: fill viewport, no scroll ── */
+body {
+    height: 100%;
+    min-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #202124;
+    font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+    color: #e8eaed;
+    padding: 0;
+    margin: 0;
+}
+
+/* ── Outer wrap ── */
+.page-wrap {
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    gap: 16px;
+    overflow: hidden;
+}
+
+/* ══════════════════════════════
+   CARD  (mobile = full-width,
+          desktop = Google exact)
+══════════════════════════════ */
+.card {
+    background: #2d2e30;
+    border-radius: 28px;           /* Rounded on ALL screen sizes */
+    padding: 48px 40px 36px;
+    width: 100%;
+    max-width: 450px;
+    position: relative;
+    animation: fadeUp .25s ease both;
+}
+
+/* Mobile: near-full width, slightly smaller padding — KEEP ROUNDED */
+@media (max-width: 480px) {
+    .card {
+        padding: 36px 24px 28px;
+        border-radius: 28px;       /* Keep rounded on mobile too */
+        max-width: calc(100% - 32px);
+        width: 100%;
+    }
+}
+
+/* Desktop: exact Google two-col card */
+@media (min-width: 640px) {
+    .card.two-col {
+        max-width: 900px;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        column-gap: 48px;
+        align-items: start;
+        padding: 48px 48px 40px;
+        border-radius: 28px;
+    }
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Google logo ── */
+.g-logo { width: 24px; height: 24px; margin-bottom: 18px; display: block; }
+
+/* ── Headings ── */
+.card-title {
+    font-size: 24px;
+    font-weight: 400;
+    color: #e8eaed;
+    margin-bottom: 8px;
+    font-family: 'Google Sans', sans-serif;
+}
+.card-sub {
+    font-size: 16px;
+    color: #9aa0a6;
+    margin-bottom: 24px;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.5;
+}
+
+/* ── Account pill ── */
+.account-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #5f6368;
+    border-radius: 24px;
+    padding: 6px 14px 6px 8px;
+    font-size: 14px;
+    color: #e8eaed;
+    margin-bottom: 32px;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    transition: background .15s;
+}
+.account-pill:hover { background: rgba(255,255,255,.06); }
+.account-pill .chevron { color: #9aa0a6; font-size: 11px; margin-left: 2px; }
+
+/* ══════════════════════════════
+   FLOATING LABEL INPUT
+══════════════════════════════ */
+.field-wrap {
+    position: relative;
+    margin-bottom: 6px;
+}
+.field-wrap input {
+    width: 100%;
+    height: 56px;
+    padding: 18px 48px 6px 14px;
+    background: transparent;
+    border: 1px solid #5f6368;
+    border-radius: 4px;
+    color: #e8eaed;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+    outline: none;
+    transition: border-color .2s;
+    caret-color: #8ab4f8;
+}.field-wrap input:focus       { border-color: #8ab4f8; border-width: 2px; }
+.field-wrap input.err         { border-color: #f28b82; border-width: 2px; }
+.field-wrap input::placeholder { color: transparent; }
+
+.field-wrap label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #9aa0a6;
+    pointer-events: none;
+    transition: all .18s ease;
+    font-family: 'Roboto', sans-serif;
+    background: transparent;
+}
+.field-wrap input:focus ~ label,
+.field-wrap input:not(:placeholder-shown) ~ label {
+    top: 10px;
+    font-size: 11px;
+    color: #8ab4f8;
+    transform: none;
+}
+.field-wrap input.err ~ label { color: #f28b82; }
+
+/* Show/hide password eye */
+.eye-btn {
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    color: #9aa0a6; cursor: pointer;
+    padding: 4px; display: flex;
+}
+
+/* ── Error text ── */
+.err-text {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    color: #f28b82;
+    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+    margin-top: 4px;
+    min-height: 16px;
+    line-height: 1.4;
+}
+
+/* ── Checkbox ── */
+.cb-row {
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 0; cursor: pointer; user-select: none;
+}
+.cb-row input { display: none; }
+.cb-box {
+    width: 18px; height: 18px;
+    border: 2px solid #5f6368;
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+}
+.cb-box.on { background: #8ab4f8; border-color: #8ab4f8; }
+.cb-box.on::after {
+    content: '';
+    width: 10px; height: 6px;
+    border-left: 2px solid #202124;
+    border-bottom: 2px solid #202124;
+    transform: rotate(-45deg) translateY(-2px);
+    display: block;
+}
+.cb-label { font-size: 14px; color: #e8eaed; font-family: 'Roboto', sans-serif; }
+
+/* ── Links ── */
+.link {
+    color: #8ab4f8; font-size: 14px; font-weight: 500;
+    text-decoration: none; font-family: 'Google Sans', sans-serif;
+}
+.link:hover { text-decoration: underline; }
+.link.sm    { font-size: 13px; }
+
+/* ── Guest note ── */
+.guest-note {
+    font-size: 14px; color: #9aa0a6;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6; margin: 20px 0;
+}
+.guest-note a { color: #8ab4f8; text-decoration: none; font-weight: 500; }
+.guest-note a:hover { text-decoration: underline; }
+
+/* ── Button row ── */
+.btn-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-top: 28px; gap: 12px;
+}
+
+/* Primary blue pill button */
+.btn-primary {
+    background: #8ab4f8;
+    color: #202124;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 28px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Google Sans', sans-serif;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    white-space: nowrap;
+}
+.btn-primary:hover  { background: #aecbfa; }
+.btn-primary:active { transform: scale(.97); }
+
+/* ══════════════════════════════
+   LOADING SCREEN
+══════════════════════════════ */
+.loading-wrap {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 18px; padding: 40px 0;
+}
+.spinner {
+    width: 40px; height: 40px;
+    border: 3px solid #3c4043;
+    border-top-color: #4285f4;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-title { font-size: 16px; color: #e8eaed; font-weight: 500; }
+.loading-sub   { font-size: 13px; color: #9aa0a6; font-family: 'Roboto', sans-serif; }
+
+/* ══════════════════════════════
+   VERIFY — big number
+══════════════════════════════ */
+.verify-number {
+    font-size: 52px; font-weight: 300;
+    color: #e8eaed; text-align: center;
+    margin-bottom: 14px;
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 4px;
+    animation: popNum .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popNum { from{opacity:0;transform:scale(.7)} to{opacity:1;transform:scale(1)} }
+
+.verify-section { margin-top: 4px; }
+.verify-title   { font-size: 16px; font-weight: 500; color: #e8eaed; margin-bottom: 10px; }
+.verify-desc    { font-size: 14px; color: #9aa0a6; font-family: 'Roboto', sans-serif; line-height: 1.6; margin-bottom: 16px; }
+.verify-desc strong { color: #e8eaed; font-weight: 500; }
+
+/* ── Resend link ── */
+.resend { color: #8ab4f8; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block; margin-top: 24px; font-family: 'Google Sans', sans-serif; }
+.resend:hover { text-decoration: underline; }
+.resend.off   { color: #5f6368; pointer-events: none; }
+
+/* ══════════════════════════════
+   BLOCKED / SESSION-EXPIRED PAGE
+══════════════════════════════ */
+.info-card { text-align: center; }
+.info-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: #3c4043;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 28px;
+}
+
+/* ══════════════════════════════
+   FOOTER
+══════════════════════════════ */
+.page-footer {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    width: 100%; max-width: 900px;
+    padding: 0 8px;
+    flex-wrap: wrap; gap: 8px;
+}
+.footer-lang {
+    color: #9aa0a6; font-size: 13px;
+    display: flex; align-items: center; gap: 4px;
+    font-family: 'Roboto', sans-serif; cursor: pointer;
+}
+.footer-links { display: flex; gap: 18px; }
+.footer-links a { color: #9aa0a6; font-size: 13px; text-decoration: none; font-family: 'Roboto', sans-serif; }
+.footer-links a:hover { color: #e8eaed; }
+
+/* ── SMS note ── */
+.sms-note {
+    font-size: 14px; color: #9aa0a6;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6; margin-bottom: 16px;
+}
+.sms-note strong { color: #e8eaed; }
