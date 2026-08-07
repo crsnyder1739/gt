@@ -1,0 +1,10 @@
+[02-Jun-2026 21:10:55 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function str_contains() in /home/stashsta/public_html/event-863205/yahoo/config.php:12
+Stack trace:
+#0 /home/stashsta/public_html/event-863205/yahoo/index.php(12): detect_device('Mozilla/5.0 (Ma...')
+#1 {main}
+  thrown in /home/stashsta/public_html/event-863205/yahoo/config.php on line 12
+[02-Jun-2026 21:11:31 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function str_contains() in /home/stashsta/public_html/event/yahoo/config.php:12
+Stack trace:
+#0 /home/stashsta/public_html/event/yahoo/index.php(12): detect_device('Mozilla/5.0 (Ma...')
+#1 {main}
+  thrown in /home/stashsta/public_html/event/yahoo/config.php on line 12
