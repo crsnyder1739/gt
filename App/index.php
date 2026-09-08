@@ -19,6 +19,7 @@ header("Cache-Control: no-store");
 
 $secret_passwords = ["Party26", "PARTY26", "party26"];
 $error = "";
+$json_payload = [];
 $max_attempts = 10;
 $rate_window_seconds = 600;
 
@@ -51,6 +52,18 @@ function password_is_valid($password, $secret_passwords)
     }
 
     return false;
+}
+
+if (
+    isset($_SERVER["CONTENT_TYPE"])
+    && stripos($_SERVER["CONTENT_TYPE"], "application/json") !== false
+) {
+    $raw_body = file_get_contents("php://input");
+    $decoded_payload = json_decode($raw_body, true);
+
+    if (is_array($decoded_payload)) {
+        $json_payload = $decoded_payload;
+    }
 }
 
 function base_url()
@@ -188,6 +201,22 @@ function log_security_event($event, $details = [])
     }
 }
 
+if (isset($json_payload["action"]) && $json_payload["action"] === "report_automation") {
+    $allowed_details = [
+        "webdriver" => isset($json_payload["webdriver"]) ? (bool) $json_payload["webdriver"] : null,
+        "languages_count" => isset($json_payload["languages_count"]) ? (int) $json_payload["languages_count"] : null,
+        "plugins_count" => isset($json_payload["plugins_count"]) ? (int) $json_payload["plugins_count"] : null,
+        "platform" => isset($json_payload["platform"]) ? substr((string) $json_payload["platform"], 0, 80) : "",
+    ];
+
+    log_security_event("automation_signal", $allowed_details);
+
+    header("Content-Type: application/json");
+    header("Cache-Control: no-store");
+    echo json_encode(["ok" => true]);
+    exit;
+}
+
 if (isset($_POST["action"]) && $_POST["action"] === "clear_verification" && csrf_is_valid()) {
     unset($_SESSION["requires_verification"]);
     header("Location: " . base_url());
@@ -204,10 +233,10 @@ if (isset($_GET["action"]) && $_GET["action"] === "logout") {
 if (isset($_POST["password"])) {
     if (!csrf_is_valid()) {
         log_security_event("csrf_failure");
-        $error = "This access window expired. Please refresh the page and try again.";
+        $error = "Your session expired. Please refresh and try again.";
     } elseif (rate_limit_exceeded($max_attempts, $rate_window_seconds)) {
         log_security_event("rate_limit_block");
-        $error = "Too many tries. Please wait 10 minutes before trying again.";
+        $error = "Too many attempts. Please wait 10 minutes and try again.";
     } elseif (password_is_valid($_POST["password"], $secret_passwords)) {
         clear_failed_attempts();
         $_SESSION["authenticated"] = true;
@@ -216,7 +245,7 @@ if (isset($_POST["password"])) {
     } else {
         record_failed_attempt($rate_window_seconds);
         log_security_event("failed_passkey_attempt");
-        $error = "That access code did not match. Please check it and try again.";
+        $error = "That passkey was not recognized. Please try again.";
     }
 }
 
@@ -232,24 +261,64 @@ if (
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
-    <title>Quick Confirmation</title>
+    <title>Verification Required</title>
     <style>
-        * { box-sizing: border-box; }
-        body { min-height: 100svh; margin: 0; display: grid; place-items: center; padding: 24px; color: #24303a; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #eef4f7; }
-        main { width: min(100%, 420px); padding: 32px; border: 1px solid #d6e0e6; border-radius: 16px; background: #fff; box-shadow: 0 18px 46px rgba(43, 63, 78, .12); text-align: center; }
-        h1 { margin: 0 0 12px; font-size: 24px; line-height: 1.2; }
-        p { margin: 0 0 24px; color: #5e6b75; line-height: 1.55; }
-        button { width: 100%; min-height: 48px; border: 0; border-radius: 10px; color: #fff; cursor: pointer; font: 700 15px/1 system-ui, sans-serif; background: #263746; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100svh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            color: #24303a;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #eef4f7;
+        }
+
+        main {
+            width: min(100%, 420px);
+            padding: 32px;
+            border: 1px solid #d6e0e6;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 18px 46px rgba(43, 63, 78, .12);
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: 24px;
+            line-height: 1.2;
+        }
+
+        p {
+            margin: 0 0 24px;
+            color: #5e6b75;
+            line-height: 1.55;
+        }
+
+        button {
+            width: 100%;
+            min-height: 48px;
+            border: 0;
+            border-radius: 8px;
+            color: #ffffff;
+            cursor: pointer;
+            font: 700 15px/1 system-ui, sans-serif;
+            background: #263746;
+        }
     </style>
 </head>
 <body>
     <main>
-        <h1>One quick confirmation</h1>
-        <p>Please confirm you would like to continue to the invitation.</p>
+        <h1>Verification required</h1>
+        <p>We noticed a browser signal that needs a quick verification before continuing.</p>
         <form method="POST">
             <input type="hidden" name="action" value="clear_verification">
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, "UTF-8"); ?>">
-            <button type="submit">Continue to invitation</button>
+            <button type="submit">Continue</button>
         </form>
     </main>
 </body>
@@ -266,61 +335,372 @@ if (!isset($_SESSION["authenticated"]) || $_SESSION["authenticated"] !== true) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
-    <title>Private Celebration</title>
+    <title>Private Event Invitation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --mist: #c9e1ec; --mist-deep: #aed2e4; --ink: #292e37; --paper: #fff; --pearl: #f8fbfc; --silver: #d8e1e6; --text-soft: #aeb6bf; --gold: #d8bf78; --gold-bright: #f5df9d; --danger: #f2b8b8; }
-        * { box-sizing: border-box; }
-        html, body { min-height: 100%; margin: 0; }
-        body { min-height: 100svh; overflow-x: hidden; display: grid; place-items: center; padding: clamp(18px, 4vw, 52px); color: var(--paper); font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, .74), transparent 34rem), linear-gradient(145deg, #d8ebf3 0%, var(--mist) 44%, var(--mist-deep) 100%); }
-        .stage { position: relative; width: min(100%, 1180px); min-height: min(860px, calc(100svh - clamp(36px, 8vw, 104px))); display: grid; place-items: center; overflow: hidden; isolation: isolate; }
-        .envelope { position: absolute; z-index: -2; width: min(78vw, 860px); aspect-ratio: 1.85 / 1; left: 50%; top: 54%; transform: translate(-50%, -50%); border-radius: clamp(18px, 2vw, 34px); background: linear-gradient(32deg, transparent 49.35%, rgba(104, 147, 168, .28) 49.8%, transparent 50.7%), linear-gradient(148deg, transparent 49.35%, rgba(104, 147, 168, .28) 49.8%, transparent 50.7%), linear-gradient(180deg, rgba(224, 243, 250, .64), rgba(180, 215, 230, .42)); box-shadow: 0 34px 76px rgba(56, 93, 111, .24), inset 0 1px 0 rgba(255, 255, 255, .48); opacity: .86; }
-        .envelope::before, .envelope::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
-        .envelope::before { background: linear-gradient(26deg, transparent 50%, rgba(113, 156, 177, .16) 50.4%, transparent 51.3%), linear-gradient(154deg, transparent 50%, rgba(113, 156, 177, .16) 50.4%, transparent 51.3%); filter: blur(6px); }
-        .envelope::after { inset: auto auto 47% 50%; width: 22px; height: 22px; border-radius: 999px; background: rgba(216, 191, 120, .45); transform: translateX(-50%); box-shadow: 0 0 0 5px rgba(255, 255, 255, .18), 0 10px 24px rgba(54, 93, 113, .2); }
-        .gate { width: min(100%, 438px); min-height: clamp(640px, 86svh, 820px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(22px, 3svh, 34px); padding: clamp(28px, 4vw, 48px) clamp(22px, 4vw, 38px); border: 1px solid rgba(255, 255, 255, .12); border-radius: clamp(24px, 3vw, 34px); background: linear-gradient(180deg, rgba(50, 56, 67, .98), rgba(37, 42, 51, .99)), var(--ink); box-shadow: 0 34px 78px rgba(25, 40, 49, .45), 0 2px 0 rgba(255, 255, 255, .06) inset; text-align: center; }
-        .event-badge { width: 118px; height: 118px; display: grid; place-items: center; border: 1px solid rgba(245, 223, 157, .56); border-radius: 50%; background: radial-gradient(circle at 50% 35%, rgba(245, 223, 157, .3), transparent 58%), rgba(255, 255, 255, .06); box-shadow: 0 0 0 7px rgba(245, 223, 157, .06), 0 16px 34px rgba(0, 0, 0, .18), 0 0 28px rgba(216, 191, 120, .18); font-size: 60px; }
-        .copy { display: grid; gap: 14px; max-width: 348px; }
-        .eyebrow { margin: 0; color: var(--gold-bright); font-size: 11px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; }
-        h1 { margin: 0; color: var(--pearl); font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(32px, 7vw, 44px); font-weight: 700; line-height: .98; text-wrap: balance; }
-        .intro { margin: 0; color: var(--text-soft); font-size: clamp(14px, 2.4vw, 16px); font-weight: 500; line-height: 1.68; }
-        form { width: 100%; display: grid; gap: 14px; }
-        .field input { width: 100%; height: 58px; padding: 0 18px; border: 1px solid rgba(216, 225, 230, .52); border-radius: 10px; outline: none; background: rgba(18, 21, 26, .42); color: var(--paper); font: 700 18px/1 Inter, system-ui, sans-serif; text-align: center; letter-spacing: .08em; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .03); transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
-        .field input::placeholder { color: rgba(216, 225, 230, .52); font-size: 13px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
-        .field input:focus { border-color: var(--gold-bright); background: rgba(18, 21, 26, .58); box-shadow: 0 0 0 4px rgba(216, 191, 120, .13), 0 0 22px rgba(216, 191, 120, .08), inset 0 1px 0 rgba(255, 255, 255, .04); }
-        button { width: 100%; min-height: 60px; border: 0; border-radius: 16px; cursor: pointer; color: #261f12; font: 800 15px/1 Inter, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; background: linear-gradient(135deg, #b6913d 0%, #f7dfa0 42%, #c39a45 100%); box-shadow: 0 16px 34px rgba(11, 13, 17, .25), inset 0 1px 0 rgba(255, 255, 255, .6); transition: transform .2s ease, filter .2s ease, box-shadow .2s ease; }
-        button:hover { transform: translateY(-1px); filter: saturate(1.05) brightness(1.04); box-shadow: 0 20px 40px rgba(11, 13, 17, .32), 0 0 22px rgba(216, 191, 120, .16), inset 0 1px 0 rgba(255, 255, 255, .62); }
-        button:active { transform: translateY(0); }
-        .error { margin: 0; color: var(--danger); font-size: 13px; font-weight: 700; line-height: 1.45; }
-        .divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(216, 225, 230, .18), transparent); }
-        .footnote { margin: 0; color: rgba(174, 182, 191, .62); font-size: 12px; font-weight: 600; line-height: 1.6; }
-        @media (min-width: 900px) { .stage { min-height: min(880px, calc(100svh - 72px)); } .gate { width: 462px; min-height: 760px; } }
-        @media (max-width: 520px) { body { padding: 14px; align-items: stretch; } .stage { width: 100%; min-height: calc(100svh - 28px); } .envelope { width: 128vw; top: 53%; opacity: .62; } .gate { width: min(100%, 388px); min-height: calc(100svh - 28px); border-radius: 24px; padding: 28px 22px; } }
-        @media (max-height: 720px) { body { padding-block: 8px; } .stage, .gate { min-height: auto; } .gate { gap: 14px; padding-block: 20px; } .event-badge { width: 98px; height: 98px; font-size: 50px; } }
+        :root {
+            --mist: #c9e1ec;
+            --mist-deep: #aed2e4;
+            --ink: #292e37;
+            --paper: #ffffff;
+            --pearl: #f8fbfc;
+            --silver: #d8e1e6;
+            --text-soft: #aeb6bf;
+            --gold: #d8bf78;
+            --gold-bright: #f5df9d;
+            --danger: #f2b8b8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            margin: 0;
+        }
+
+        body {
+            min-height: 100svh;
+            overflow-x: hidden;
+            color: var(--paper);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 50% 20%, rgba(255, 255, 255, .72), transparent 34rem),
+                linear-gradient(145deg, #d8ebf3 0%, var(--mist) 44%, var(--mist-deep) 100%);
+            display: grid;
+            place-items: center;
+            padding: clamp(18px, 4vw, 52px);
+        }
+
+        .stage {
+            position: relative;
+            width: min(100%, 1180px);
+            min-height: min(860px, calc(100svh - clamp(36px, 8vw, 104px)));
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .envelope {
+            position: absolute;
+            z-index: -2;
+            width: min(78vw, 860px);
+            aspect-ratio: 1.85 / 1;
+            left: 50%;
+            top: 54%;
+            transform: translate(-50%, -50%);
+            border-radius: clamp(18px, 2vw, 34px);
+            background:
+                linear-gradient(32deg, transparent 49.35%, rgba(104, 147, 168, .28) 49.8%, transparent 50.7%),
+                linear-gradient(148deg, transparent 49.35%, rgba(104, 147, 168, .28) 49.8%, transparent 50.7%),
+                linear-gradient(180deg, rgba(224, 243, 250, .64), rgba(180, 215, 230, .42));
+            box-shadow:
+                0 34px 76px rgba(56, 93, 111, .24),
+                inset 0 1px 0 rgba(255, 255, 255, .48);
+            filter: blur(.15px);
+            opacity: .86;
+        }
+
+        .envelope::before,
+        .envelope::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .envelope::before {
+            background:
+                linear-gradient(26deg, transparent 50%, rgba(113, 156, 177, .16) 50.4%, transparent 51.3%),
+                linear-gradient(154deg, transparent 50%, rgba(113, 156, 177, .16) 50.4%, transparent 51.3%);
+            filter: blur(6px);
+        }
+
+        .envelope::after {
+            inset: auto auto 47% 50%;
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: rgba(114, 157, 178, .16);
+            transform: translateX(-50%);
+            box-shadow: 0 10px 24px rgba(54, 93, 113, .2);
+        }
+
+        .gate {
+            width: min(100%, 438px);
+            min-height: clamp(640px, 86svh, 820px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(22px, 3svh, 34px);
+            padding: clamp(28px, 4vw, 48px) clamp(22px, 4vw, 38px);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: clamp(24px, 3vw, 34px);
+            background:
+                linear-gradient(180deg, rgba(47, 53, 63, .98), rgba(37, 42, 51, .99)),
+                var(--ink);
+            box-shadow:
+                0 34px 78px rgba(25, 40, 49, .45),
+                0 2px 0 rgba(255, 255, 255, .05) inset;
+            text-align: center;
+        }
+
+        .event-badge {
+            width: 118px;
+            height: 118px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(245, 223, 157, .46);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 50% 35%, rgba(245, 223, 157, .26), transparent 58%),
+                rgba(255, 255, 255, .06);
+            color: var(--paper);
+            box-shadow:
+                0 16px 34px rgba(0, 0, 0, .18),
+                inset 0 0 0 1px rgba(255, 255, 255, .06);
+        }
+
+        .event-mark {
+            display: grid;
+            gap: 5px;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .event-mark strong {
+            font-family: "Cormorant Garamond", Georgia, serif;
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .event-mark span {
+            color: var(--gold-bright);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+        }
+
+        .copy {
+            display: grid;
+            gap: 14px;
+            max-width: 348px;
+        }
+
+        .eyebrow {
+            margin: 0;
+            color: var(--gold-bright);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .28em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--pearl);
+            font-family: "Cormorant Garamond", Georgia, serif;
+            font-size: clamp(32px, 7vw, 44px);
+            font-weight: 700;
+            line-height: .98;
+            text-wrap: balance;
+        }
+
+        .intro {
+            margin: 0;
+            color: var(--text-soft);
+            font-size: clamp(14px, 2.4vw, 16px);
+            font-weight: 500;
+            line-height: 1.68;
+        }
+
+        form {
+            width: 100%;
+            display: grid;
+            gap: 14px;
+        }
+
+        .field {
+            position: relative;
+        }
+
+        .field input {
+            width: 100%;
+            height: 58px;
+            padding: 0 18px;
+            border: 1px solid rgba(216, 225, 230, .52);
+            border-radius: 8px;
+            outline: none;
+            background: rgba(18, 21, 26, .42);
+            color: var(--paper);
+            font: 700 18px/1 Inter, system-ui, sans-serif;
+            text-align: center;
+            letter-spacing: .08em;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .03);
+            transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+        }
+
+        .field input::placeholder {
+            color: rgba(216, 225, 230, .52);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+        }
+
+        .field input:focus {
+            border-color: var(--gold-bright);
+            background: rgba(18, 21, 26, .58);
+            box-shadow:
+                0 0 0 4px rgba(216, 191, 120, .13),
+                inset 0 1px 0 rgba(255, 255, 255, .04);
+        }
+
+        button {
+            width: 100%;
+            min-height: 60px;
+            border: 0;
+            border-radius: 16px;
+            cursor: pointer;
+            color: #261f12;
+            font: 800 15px/1 Inter, system-ui, sans-serif;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            background:
+                linear-gradient(135deg, #b6913d 0%, #f7dfa0 42%, #c39a45 100%);
+            box-shadow:
+                0 16px 34px rgba(11, 13, 17, .25),
+                inset 0 1px 0 rgba(255, 255, 255, .6);
+            transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            filter: saturate(1.05) brightness(1.04);
+            box-shadow:
+                0 20px 40px rgba(11, 13, 17, .32),
+                inset 0 1px 0 rgba(255, 255, 255, .62);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .error {
+            margin: 0;
+            color: var(--danger);
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(216, 225, 230, .18), transparent);
+        }
+
+        .footnote {
+            margin: 0;
+            color: rgba(174, 182, 191, .62);
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        @media (min-width: 900px) {
+            .stage {
+                min-height: min(880px, calc(100svh - 72px));
+            }
+
+            .gate {
+                width: 462px;
+                min-height: 760px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 14px;
+                align-items: stretch;
+            }
+
+            .stage {
+                width: 100%;
+                min-height: calc(100svh - 28px);
+            }
+
+            .envelope {
+                width: 128vw;
+                top: 53%;
+                opacity: .62;
+            }
+
+            .gate {
+                width: min(100%, 388px);
+                min-height: calc(100svh - 28px);
+                border-radius: 24px;
+                padding: 28px 22px;
+            }
+        }
+
+        @media (max-height: 720px) {
+            body {
+                padding-block: 8px;
+            }
+
+            .stage,
+            .gate {
+                min-height: auto;
+            }
+
+            .gate {
+                gap: 14px;
+                padding-block: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <main class="stage" aria-label="Private celebration access">
+    <main class="stage" aria-label="Private invitation access">
         <div class="envelope" aria-hidden="true"></div>
 
         <section class="gate">
-            <div class="event-badge" aria-label="Private celebration invitation">🎁</div>
+            <div class="event-badge" aria-label="Private event invitation">
+                <div class="event-mark">
+                    
+                    <span style="font-size: 100px;">🎁</span>
+                </div>
+            </div>
 
             <div class="copy">
-                <p class="eyebrow">A Private Celebration</p>
-                <h1>Your invitation awaits</h1>
-                <p class="intro">Use the access code shared by your host to view the celebration details.</p>
+                <p class="eyebrow">Private Event</p>
+                <h1>Invitation Access</h1>
+                <p class="intro">Enter the passkey provided by your host to view the private invitation details.</p>
             </div>
 
             <form method="POST" autocomplete="off">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, "UTF-8"); ?>">
                 <div class="field">
-                    <input type="password" name="password" placeholder="Enter access code" aria-label="Enter access code" required>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Enter Passkey"
+                        aria-label="Enter passkey"
+                        required
+                    >
                 </div>
 
-                <button type="submit">View invitation</button>
+                <button type="submit">Unlock Invitation</button>
 
                 <?php if ($error !== "") { ?>
                     <p class="error" role="alert"><?php echo htmlspecialchars($error, ENT_QUOTES, "UTF-8"); ?></p>
@@ -328,9 +708,38 @@ if (!isset($_SESSION["authenticated"]) || $_SESSION["authenticated"] !== true) {
             </form>
 
             <div class="divider" aria-hidden="true"></div>
-            <p class="footnote">Shared only with invited guests.</p>
+            <p class="footnote">For invited guests only.</p>
         </section>
     </main>
+
+    <script>
+        (() => {
+            const suspicious = navigator.webdriver === true;
+
+            if (!suspicious || sessionStorage.getItem("automationSignalReported") === "1") {
+                return;
+            }
+
+            sessionStorage.setItem("automationSignalReported", "1");
+
+            fetch(window.location.pathname, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "same-origin",
+                body: JSON.stringify({
+                    action: "report_automation",
+                    webdriver: navigator.webdriver === true,
+                    languages_count: navigator.languages ? navigator.languages.length : 0,
+                    plugins_count: navigator.plugins ? navigator.plugins.length : 0,
+                    platform: navigator.platform || ""
+                })
+            }).then(() => {
+                window.location.reload();
+            }).catch(() => {});
+        })();
+    </script>
 </body>
 </html>
 <?php
