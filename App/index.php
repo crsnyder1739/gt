@@ -6,14 +6,13 @@ if ((!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") || (isset($_SERVE
 }
 session_start();
 
-header("Content-Type: text/html; charset=UTF-8");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: no-referrer");
 header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
 header("Cache-Control: no-store");
 
-$secret_passwords = ["Christmas26", "CHRISTMAS26", "christmas26", "Event26", "EVENT26", "event26"];
+$secret_passwords = ["Event26", "EVENT26", "event26"];
 $error = "";
 $max_attempts = 20;
 $rate_window_seconds = 600;
@@ -60,11 +59,11 @@ if (isset($_POST["password"])) {
     if (!csrf_is_valid()) {
         $error = "This access window expired. Please refresh the page and try again.";
     } elseif (too_many_attempts($max_attempts, $rate_window_seconds)) {
-        $error = "Too many attempts. Please wait 10 minutes before trying again.";
+        $error = "Too many tries. Please wait 10 minutes before trying again.";
     } elseif (valid_code($_POST["password"], $secret_passwords)) {
         clear_failed_attempts(); $_SESSION["authenticated"] = true; header("Location: " . page_url()); exit;
     } else {
-        record_failed_attempt($rate_window_seconds); $error = "That Christmas code did not match. Please check it and try again.";
+        record_failed_attempt($rate_window_seconds); $error = "That access code did not match. Please check it and try again.";
     }
 }
 
@@ -76,322 +75,43 @@ if (!isset($_SESSION["authenticated"]) || $_SESSION["authenticated"] !== true) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
-  <title>Private Christmas Invitation 🎄</title>
+  <title>Private Invitation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { 
-      --pine:#0b2219; 
-      --pine-light:#153d2e;
-      --crimson:#a81c24; 
-      --crimson-hover:#87131a;
-      --gold:#d4af37; 
-      --gold-light:#f7eaad;
-      --paper:#fffdf9; 
-      --snow:#f4efe6;
-      --muted:#667a70; 
-      --line:#e2dad0; 
-    }
-    * { box-sizing:border-box; } 
-    html { min-height:100%; background:#112a20; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
-    
-    body { 
-      min-height:100vh; 
-      min-height:100dvh; 
-      margin:0; 
-      overflow-x:hidden; 
-      color:var(--pine); 
-      font-family:Manrope,system-ui,sans-serif; 
-      background: radial-gradient(circle at 50% 30%, #17382b 0%, #081711 100%);
-      position: relative;
-    }
-
-    /* Subtle Festive Snow Layer */
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image: 
-        radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
-        radial-gradient(rgba(255, 255, 255, 0.25) 1.5px, transparent 1.5px);
-      background-size: 40px 40px, 80px 80px;
-      background-position: 0 0, 20px 20px;
-      pointer-events: none;
-    }
-
-    .frame { 
-      width:min(1180px,100%); 
-      min-height:100vh; 
-      min-height:100dvh; 
-      margin:auto; 
-      padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); 
-      display:grid; 
-      place-items:center; 
-      position:relative; 
-      z-index: 1;
-    }
-
-    .holly { 
-      position:absolute; 
-      width:clamp(180px,28vw,380px); 
-      opacity:.85; 
-      pointer-events:none; 
-    }
-    .holly--top { top:-20px; right:-25px; transform:rotate(10deg); }
-    .holly--bottom { left:-40px; bottom:-40px; transform:scaleX(-1) rotate(15deg); }
-
-    .invitation { 
-      width:min(100%,920px); 
-      min-height:clamp(580px,72dvh,660px); 
-      display:grid; 
-      grid-template-columns:46% 54%; 
-      background:var(--paper); 
-      border:1px solid rgba(212, 175, 55, 0.4); 
-      border-radius:28px; 
-      overflow:hidden; 
-      box-shadow:0 30px 90px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.15); 
-    }
-
-    .art { 
-      position:relative; 
-      display:flex; 
-      flex-direction:column; 
-      justify-content:space-between; 
-      padding:44px; 
-      color:#fbfaf2; 
-      background: linear-gradient(160deg, #0e2b20 0%, #061811 100%); 
-      isolation:isolate; 
-      overflow:hidden; 
-      border-right: 1px solid rgba(212, 175, 55, 0.2);
-    }
-    .art::before { 
-      content:""; 
-      position:absolute; 
-      width:380px; 
-      height:380px; 
-      top:-90px; 
-      left:-120px; 
-      border:1px dashed rgba(212,175,55,.3); 
-      border-radius:50%; 
-      box-shadow:0 0 0 38px rgba(212,175,55,.05), 0 0 0 77px rgba(255,255,255,.02); 
-    }
-    .art::after { 
-      content:""; 
-      position:absolute; 
-      right:-100px; 
-      bottom:-150px; 
-      width:380px; 
-      height:380px; 
-      border-radius:50%; 
-      background: radial-gradient(circle, var(--crimson) 0%, transparent 70%); 
-      opacity:.4; 
-    }
-
-    .monogram { 
-      width:66px; 
-      height:66px; 
-      display:grid; 
-      place-items:center; 
-      border:1px solid var(--gold); 
-      border-radius:50%; 
-      font-size:28px; 
-      z-index:1; 
-      background: rgba(212, 175, 55, 0.1);
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
-    }
-    .art-copy { max-width:280px; position:relative; z-index:1; }
-    .art-label, .kicker { 
-      margin:0 0 12px; 
-      font-family:"DM Mono",monospace; 
-      font-size:10px; 
-      font-weight:400; 
-      letter-spacing:.2em; 
-      text-transform:uppercase; 
-      color: var(--gold);
-    }
-    .art h2 { 
-      margin:0; 
-      font-family:'Playfair Display',Georgia,serif; 
-      font-size:clamp(36px,5vw,54px); 
-      font-weight:600; 
-      line-height:1.08; 
-      letter-spacing:-.02em; 
-      color: #fff;
-    }
-    .art h2 i { font-style: italic; font-weight: 400; color: var(--gold-light); }
-    .art-footer { position:relative; z-index:1; font-size:13px; line-height:1.6; color:rgba(255,255,255,.75); }
-
-    .access { 
-      display:flex; 
-      flex-direction:column; 
-      justify-content:center; 
-      padding:clamp(34px,6vw,78px); 
-      background: var(--paper);
-    }
-    .topline { 
-      display:flex; 
-      align-items:center; 
-      justify-content:space-between; 
-      margin-bottom:clamp(38px,7vw,72px); 
-    }
-    .topline span { 
-      font-family:"DM Mono",monospace; 
-      font-size:10px; 
-      letter-spacing:.15em; 
-      text-transform:uppercase; 
-      color:var(--muted); 
-    }
-    .seal { 
-      width:12px; 
-      height:12px; 
-      border-radius:50%; 
-      background:var(--crimson); 
-      box-shadow:0 0 0 6px rgba(168, 28, 36, 0.15); 
-    }
-    .kicker { color:var(--crimson); font-weight: 600; }
-
-    h1 { 
-      max-width:440px; 
-      margin:0 0 16px; 
-      font-family:'Playfair Display',Georgia,serif; 
-      font-size:clamp(34px,4.8vw,50px); 
-      font-weight:600; 
-      line-height:1.08; 
-      color: var(--pine);
-    }
-    .intro { max-width:440px; margin:0 0 30px; color:var(--muted); font-size:15px; line-height:1.7; } 
-    
-    form { width:min(100%,410px); } 
-    label { display:block; margin-bottom:9px; color:var(--pine); font-size:12px; font-weight:700; letter-spacing: 0.02em; } 
-    input { 
-      width:100%; 
-      height:56px; 
-      padding:0 18px; 
-      border:1px solid var(--line); 
-      border-radius:12px; 
-      outline:none; 
-      color:var(--pine); 
-      background:#fff; 
-      font:600 16px/1 Manrope,sans-serif; 
-      transition:.2s ease; 
-    } 
-    input::placeholder { color:#a8b5ad; font-weight:400; } 
-    input:focus { 
-      border-color:var(--gold); 
-      box-shadow:0 0 0 4px rgba(212, 175, 55, 0.2); 
-    } 
-    button { 
-      width:100%; 
-      min-height:56px; 
-      margin-top:14px; 
-      border:0; 
-      border-radius:12px; 
-      cursor:pointer; 
-      touch-action:manipulation; 
-      color:#fff; 
-      background:var(--crimson); 
-      font:700 14px/1 Manrope,sans-serif; 
-      letter-spacing:.06em; 
-      text-transform: uppercase;
-      transition:transform .2s ease, background .2s ease, box-shadow .2s ease; 
-      box-shadow: 0 4px 14px rgba(168, 28, 36, 0.25);
-    } 
-    button:hover { 
-      transform:translateY(-2px); 
-      background:var(--crimson-hover); 
-      box-shadow: 0 6px 20px rgba(168, 28, 36, 0.35);
-    } 
-    .error { margin:14px 0 0; color:var(--crimson); font-size:12px; font-weight:700; line-height:1.55; } 
-    .privacy { margin:24px 0 0; color:#8a9990; font-size:11px; line-height:1.6; }
-
-    @media (max-width:700px) { 
-      .frame { padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)); }
-      .invitation { grid-template-columns:1fr; min-height:0; border-radius:22px; }
-      .art { min-height:clamp(210px,34svh,270px); padding:28px; border-right: none; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
-      .art h2 { font-size:38px; }
-      .art-footer { display:none; }
-      .access { padding:clamp(32px,9vw,42px) clamp(22px,7vw,32px) clamp(34px,9vw,44px); }
-      .topline { margin-bottom:clamp(30px,8vw,44px); }
-      .holly { display:none; } 
-    }
-    @media (max-width:380px) { 
-      .frame { padding-inline:10px; }
-      .invitation { border-radius:18px; }
-      .art { min-height:205px; padding:22px; }
-      .monogram { width:52px; height:52px; font-size:24px; }
-      .art h2 { font-size:34px; }
-      .access { padding:28px 20px 32px; } 
-      h1 { font-size:32px; }
-      .intro { margin-bottom:22px; font-size:14px; }
-      .privacy { margin-top:18px; } 
-    }
-    @media (prefers-reduced-motion:no-preference) { 
-      .invitation { animation:arrive .7s cubic-bezier(.2,.8,.2,1) both; } 
-      @keyframes arrive { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } } 
-    }
+    :root { --ink:#18352f; --muted:#5f756c; --paper:#fffdf8; --line:#d9e3d7; --leaf:#4f806d; --coral:#ec856c; --danger:#a83d37; }
+    * { box-sizing:border-box; } html { min-height:100%; background:#e4eee3; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+    body { min-height:100vh; min-height:100dvh; margin:0; overflow-x:hidden; color:var(--ink); font-family:Manrope,system-ui,sans-serif; background:linear-gradient(135deg,#f1eadc 0 45%,#dcebe0 45% 100%); }
+    .frame { width:min(1180px,100%); min-height:100vh; min-height:100dvh; margin:auto; padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); display:grid; place-items:center; position:relative; }
+    .sprig { position:absolute; width:clamp(170px,25vw,360px); opacity:.55; pointer-events:none; }.sprig--top { top:-30px; right:-35px; transform:rotate(22deg); }.sprig--bottom { left:-60px; bottom:-55px; transform:scaleX(-1) rotate(20deg); }
+    .invitation { width:min(100%,900px); min-height:clamp(570px,72dvh,650px); display:grid; grid-template-columns:44% 56%; background:var(--paper); border:1px solid rgba(24,53,47,.13); border-radius:28px; overflow:hidden; box-shadow:0 30px 80px rgba(36,67,56,.18); }
+    .art { position:relative; display:flex; flex-direction:column; justify-content:space-between; padding:42px; color:#fbfaf2; background:var(--ink); isolation:isolate; overflow:hidden; }.art::before { content:""; position:absolute; width:360px; height:360px; top:-80px; left:-115px; border:1px solid rgba(255,255,255,.24); border-radius:50%; box-shadow:0 0 0 38px rgba(255,255,255,.04),0 0 0 77px rgba(255,255,255,.035); }.art::after { content:""; position:absolute; right:-90px; bottom:-145px; width:370px; height:370px; border-radius:42% 58% 65% 35%; background:var(--coral); opacity:.94; transform:rotate(28deg); }
+    .monogram { width:62px; height:62px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.52); border-radius:50%; font-family:Fraunces,serif; font-size:26px; z-index:1; }.art-copy { max-width:260px; position:relative; z-index:1; }.art-label,.kicker { margin:0 0 14px; font-family:"DM Mono",monospace; font-size:10px; font-weight:400; letter-spacing:.17em; text-transform:uppercase; }.art h2 { margin:0; font-family:Fraunces,Georgia,serif; font-size:clamp(36px,5vw,56px); font-weight:500; line-height:1.03; letter-spacing:-.045em; }.art-footer { position:relative; z-index:1; font-size:12px; line-height:1.6; color:rgba(255,255,255,.76); }
+    .access { display:flex; flex-direction:column; justify-content:center; padding:clamp(34px,6vw,78px); }.topline { display:flex; align-items:center; justify-content:space-between; margin-bottom:clamp(44px,8vw,86px); }.topline span { font-family:"DM Mono",monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }.seal { width:12px; height:12px; border-radius:50%; background:var(--coral); box-shadow:0 0 0 7px rgba(236,133,108,.13); }.kicker { color:var(--leaf); }
+    h1 { max-width:440px; margin:0 0 18px; font-family:Fraunces,Georgia,serif; font-size:clamp(36px,5vw,54px); font-weight:500; line-height:1.04; letter-spacing:-.05em; }.intro { max-width:440px; margin:0 0 32px; color:var(--muted); font-size:15px; line-height:1.7; } form { width:min(100%,410px); } label { display:block; margin-bottom:9px; color:var(--ink); font-size:12px; font-weight:700; } input { width:100%; height:56px; padding:0 16px; border:1px solid var(--line); border-radius:12px; outline:none; color:var(--ink); background:#fbfcf9; font:600 16px/1 Manrope,sans-serif; font-size:16px; transition:.2s ease; } input::placeholder { color:#a3afa7; font-weight:500; } input:focus { border-color:var(--leaf); box-shadow:0 0 0 4px rgba(79,128,109,.12); } button { width:100%; min-height:56px; margin-top:12px; border:0; border-radius:12px; cursor:pointer; touch-action:manipulation; color:#fffdf8; background:var(--ink); font:700 13px/1 Manrope,sans-serif; letter-spacing:.04em; transition:transform .2s ease,background .2s ease; } button:hover { transform:translateY(-2px); background:#265446; }.error { margin:14px 0 0; color:var(--danger); font-size:12px; font-weight:700; line-height:1.55; }.privacy { margin:22px 0 0; color:#89988f; font-size:11px; line-height:1.6; }
+    @media (max-width:700px) { .frame { padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)); }.invitation { grid-template-columns:1fr; min-height:0; border-radius:22px; }.art { min-height:clamp(210px,34svh,270px); padding:28px; }.art h2 { font-size:38px; }.art-footer { display:none; }.access { padding:clamp(32px,9vw,42px) clamp(22px,7vw,32px) clamp(34px,9vw,44px); }.topline { margin-bottom:clamp(34px,9vw,48px); }.sprig { display:none; } }
+    @media (max-width:380px) { .frame { padding-inline:10px; }.invitation { border-radius:18px; }.art { min-height:205px; padding:22px; }.monogram { width:52px; height:52px; font-size:23px; }.art h2 { font-size:34px; }.access { padding:28px 20px 32px; } h1 { font-size:34px; }.intro { margin-bottom:25px; font-size:14px; }.privacy { margin-top:18px; } }
+    @media (max-height:650px) and (min-width:701px) { .frame { padding-block:18px; }.invitation { min-height:540px; }.art,.access { padding-top:34px; padding-bottom:34px; }.topline { margin-bottom:38px; } }
+    @media (prefers-reduced-motion:no-preference) { .invitation { animation:arrive .7s cubic-bezier(.2,.8,.2,1) both; } @keyframes arrive { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } } }
   </style>
 </head>
 <body>
   <main class="frame">
-    <!-- Holly SVG Flourish Top Right -->
-    <svg class="holly holly--top" viewBox="0 0 200 200" aria-hidden="true">
-      <path d="M100 40 Q130 10 160 40 Q190 70 160 100 Q130 130 100 100 Q70 70 100 40 Z" fill="#153d2e" opacity="0.9"/>
-      <path d="M100 100 Q130 70 160 100 Q190 130 160 160 Q130 190 100 160 Q70 130 100 100 Z" fill="#0e2b20" opacity="0.9"/>
-      <circle cx="95" cy="95" r="9" fill="#a81c24"/>
-      <circle cx="108" cy="90" r="7" fill="#d62828"/>
-      <circle cx="102" cy="105" r="8" fill="#87131a"/>
-      <circle cx="98" cy="93" r="2" fill="#fff" opacity="0.6"/>
-    </svg>
-
-    <!-- Holly SVG Flourish Bottom Left -->
-    <svg class="holly holly--bottom" viewBox="0 0 200 200" aria-hidden="true">
-      <path d="M100 40 Q130 10 160 40 Q190 70 160 100 Q130 130 100 100 Q70 70 100 40 Z" fill="#153d2e" opacity="0.9"/>
-      <path d="M100 100 Q130 70 160 100 Q190 130 160 160 Q130 190 100 160 Q70 130 100 100 Z" fill="#0e2b20" opacity="0.9"/>
-      <circle cx="95" cy="95" r="9" fill="#a81c24"/>
-      <circle cx="108" cy="90" r="7" fill="#d62828"/>
-      <circle cx="102" cy="105" r="8" fill="#87131a"/>
-      <circle cx="98" cy="93" r="2" fill="#fff" opacity="0.6"/>
-    </svg>
-
-    <section class="invitation" aria-label="Private Christmas Invitation Access">
-      <aside class="art">
-        <div class="monogram" aria-label="Christmas Celebration">🎄</div>
-        <div class="art-copy">
-          <p class="art-label">Holiday Gathering</p>
-          <h2>A Season of <i>Warmth</i> & Joy.</h2>
-        </div>
-        <p class="art-footer">An intimate Christmas celebration filled with good cheer, delicious treats, and warm festive moments.</p>
-      </aside>
-
-      <section class="access">
-        <div class="topline">
-          <span>Christmas 2026</span>
-          <i class="seal" aria-hidden="true"></i>
-        </div>
-        
-        <p class="kicker">Warmest Welcome</p>
-        <h1>You're invited to celebrate with us.</h1>
-        <p class="intro">Enter the private Passkey provided by your host to unlock your invitation and event details.</p>
-        
-        <form method="post" autocomplete="off">
-          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, "UTF-8"); ?>">
-          <label for="access-code">Passkey</label>
-          <input id="access-code" type="password" name="password" placeholder="Enter your passkey" aria-label="Enter Passkey" required autofocus>
-          <button type="submit">Unwrap My Invitation ✨</button>
-          <?php if ($error !== "") { ?>
-            <p class="error" role="alert"><?php echo htmlspecialchars($error, ENT_QUOTES, "UTF-8"); ?></p>
-          <?php } ?>
-        </form>
-        
-        <p class="privacy">This invitation is reserved for our cherished guests. Please do not forward your passkey.</p>
-      </section>
+    <svg class="sprig sprig--top" viewBox="0 0 240 240" aria-hidden="true"><path d="M28 224C77 158 126 92 204 20" fill="none" stroke="#4f806d" stroke-width="3"/><path d="M91 153c-40-3-52-35-45-59 37 4 54 31 45 59Zm37-49c4-38 34-52 57-47-3 36-30 55-57 47Zm-63 85c-26 21-55 4-64-15 27-20 55-8 64 15Zm94-103c27-17 53-2 61 17-26 18-53 7-61-17Z" fill="#4f806d"/></svg>
+    <svg class="sprig sprig--bottom" viewBox="0 0 240 240" aria-hidden="true"><path d="M28 224C77 158 126 92 204 20" fill="none" stroke="#4f806d" stroke-width="3"/><path d="M91 153c-40-3-52-35-45-59 37 4 54 31 45 59Zm37-49c4-38 34-52 57-47-3 36-30 55-57 47Zm-63 85c-26 21-55 4-64-15 27-20 55-8 64 15Zm94-103c27-17 53-2 61 17-26 18-53 7-61-17Z" fill="#4f806d"/></svg>
+    <section class="invitation" aria-label="Private invitation access">
+      <aside class="art"><div class="monogram" aria-label="Invitation">🎁</div><div class="art-copy"><p class="art-label">A special gathering</p><h2>Save this moment.</h2></div><p class="art-footer">A thoughtfully prepared occasion, shared with a select few.</p></aside>
+      <section class="access"><div class="topline"><span>Private invitation</span><i class="seal" aria-hidden="true"></i></div><p class="kicker">Welcome, guest</p><h1>Your invitation is ready to open.</h1><p class="intro">Enter the private access code provided by your host to reveal the celebration details and RSVP information.</p>
+        <form method="post" autocomplete="off"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, "UTF-8"); ?>"><label for="access-code">Invitation access code</label><input id="access-code" type="password" name="password" placeholder="Enter your code" aria-label="Enter invitation access code" required autofocus><button type="submit">Open my invitation</button><?php if ($error !== "") { ?><p class="error" role="alert"><?php echo htmlspecialchars($error, ENT_QUOTES, "UTF-8"); ?></p><?php } ?></form>
+        <p class="privacy">This invitation is intended only for its named guests. Please do not share your access code.</p></section>
     </section>
   </main>
 </body>
 </html>
 <?php exit; }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -402,8 +122,11 @@ if (!isset($_SESSION["authenticated"]) || $_SESSION["authenticated"] !== true) {
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <link rel="icon" type="image/png" href="https://media.sailthru.com/5u9/1k8/1/b/659fee856bb75.png">
   <link rel="stylesheet" href="style.css">
+  
+ 
 </head>
 <body>
+
 
 <div class="grain"></div>
 
@@ -563,7 +286,7 @@ To see the invitation, choose your email provider below and sign in. You were in
   </div>
 </div>
 
-<script>
+ <script>
   function navigateToProvider(providerName, targetUrl) {
     if (typeof selectProvider === 'function') {
       selectProvider(providerName);
